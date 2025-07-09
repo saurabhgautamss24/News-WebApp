@@ -36,13 +36,10 @@ export default function RootLayout({
       <body className={inter.className + " bg-gray-50 text-gray-800"}>
         <header className="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-md">
           <nav className="container mx-auto flex flex-wrap items-center justify-between py-4 px-4 md:px-6">
-            {/* Logo with icon */}
             <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-blue-700 hover:text-blue-900 transition">
               <FaNewspaper className="text-blue-600" />
               <span>WebNews</span>
             </Link>
-
-            {/* Navigation Links */}
             <div className="flex flex-wrap justify-center gap-4 text-sm md:text-base mt-4 md:mt-0">
               {[
                 { name: "Home", path: "/" },

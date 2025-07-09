@@ -47,11 +47,11 @@ export async function getTopHeadlines(
   country: string = 'us',
   page: number = 1
 ): Promise<NewsResponse> {
-  const url = buildApiUrl('/top-headlines', {
-    country,
-    page: page.toString(),
-    pageSize: '20',
-  });
+  // const url = buildApiUrl('/top-headlines', {
+  //   country,
+  //   page: page.toString(),
+  //   pageSize: '20',
+  // });
 
   const response = await fetch("https://backend-swart-five-47.vercel.app/api/khabar/getTopHeadlines");
 

@@ -91,17 +91,17 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import NewsCard from '@/components/NewsCard';
 
-// ✅ Fix 1: Avoid `any` – Define proper types
 type ImageMockProps = {
   src: string;
   alt: string;
-  [key: string]: any;
+  [key: string]: string | number | boolean | undefined;
 };
 
 jest.mock('next/image', () => ({
   __esModule: true,
   default: ({ src, alt, ...rest }: ImageMockProps) => {
-    const { fill, unoptimized, sizes, ...imgProps } = rest;
+    const imgProps = rest;
+   
     return <img src={src} alt={alt} {...imgProps} />;
   },
 }));
@@ -109,7 +109,7 @@ jest.mock('next/image', () => ({
 type LinkMockProps = {
   href: string;
   children: React.ReactNode;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 jest.mock('next/link', () => ({
@@ -200,4 +200,3 @@ describe('NewsCard', () => {
     expect(image).toBeInTheDocument();
   });
 });
-

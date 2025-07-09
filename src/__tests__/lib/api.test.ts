@@ -4,8 +4,6 @@ import {
   searchNews, 
   transformArticle 
 } from '@/lib/api'
-
-// Mock fetch globally
 global.fetch = jest.fn()
 
 describe('API Service', () => {

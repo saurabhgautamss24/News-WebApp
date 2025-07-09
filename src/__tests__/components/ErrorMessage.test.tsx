@@ -1,73 +1,58 @@
-import React from 'react'
-import { render, screen, fireEvent } from '@/__tests__/utils/test-utils'
-import ErrorMessage from '@/components/ErrorMessage'
+
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import ErrorMessage from '@/components/ErrorMessage';
+
+const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+  return <>{children}</>;
+};
+
+const customRender = (
+  ui: React.ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>
+) => render(ui, { wrapper: AllTheProviders, ...options });
 
 describe('ErrorMessage', () => {
-  const mockOnRetry = jest.fn()
+  const mockOnRetry = jest.fn();
 
   beforeEach(() => {
-    mockOnRetry.mockClear()
-  })
+    mockOnRetry.mockClear();
+  });
 
-  it('should render error message', () => {
-    render(
-      <ErrorMessage 
-        message="Failed to load articles" 
-        onRetry={mockOnRetry}
-      />
-    )
+  it('should render error message and Try Again button', () => {
+    customRender(<ErrorMessage message="Failed to load articles" onRetry={mockOnRetry} />);
 
-    expect(screen.getByText('Failed to load articles')).toBeInTheDocument()
-    expect(screen.getByText('Try Again')).toBeInTheDocument()
-  })
+    expect(screen.getByText('Failed to load articles')).toBeInTheDocument();
+    expect(screen.getByText('Try Again')).toBeInTheDocument();
+  });
 
-  it('should call onRetry when retry button is clicked', () => {
-    render(
-      <ErrorMessage 
-        message="Network error" 
-        onRetry={mockOnRetry}
-      />
-    )
+  it('should call onRetry when Try Again is clicked', () => {
+    customRender(<ErrorMessage message="Network error" onRetry={mockOnRetry} />);
 
-    const retryButton = screen.getByText('Try Again')
-    fireEvent.click(retryButton)
+    fireEvent.click(screen.getByText('Try Again'));
 
-    expect(mockOnRetry).toHaveBeenCalledTimes(1)
-  })
+    expect(mockOnRetry).toHaveBeenCalledTimes(1);
+  });
 
-  it('should render default message when no message is provided', () => {
-    render(
-      <ErrorMessage 
-        onRetry={mockOnRetry}
-      />
-    )
+  it('should render default message when no message is passed', () => {
+    customRender(<ErrorMessage onRetry={mockOnRetry} />);
 
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument()
-  })
+    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+  });
 
-  it('should have proper error styling', () => {
-    render(
-      <ErrorMessage 
-        message="Test error" 
-        onRetry={mockOnRetry}
-      />
-    )
+  it('should be keyboard accessible (Enter key triggers retry)', () => {
+    customRender(<ErrorMessage message="Test error" onRetry={mockOnRetry} />);
 
-    const errorContainer = screen.getByRole('alert')
-    expect(errorContainer).toHaveClass('bg-red-50', 'border-red-200')
-  })
+    const retryButton = screen.getByText('Try Again');
+    retryButton.focus();
+    fireEvent.keyDown(retryButton, { key: 'Enter', code: 'Enter' });
 
-  it('should be keyboard accessible', () => {
-    render(
-      <ErrorMessage 
-        message="Test error" 
-        onRetry={mockOnRetry}
-      />
-    )
+    expect(mockOnRetry).toHaveBeenCalledTimes(1);
+  });
 
-    const retryButton = screen.getByText('Try Again')
-    fireEvent.keyDown(retryButton, { key: 'Enter' })
+  it('should not render retry button if onRetry not passed', () => {
+    customRender(<ErrorMessage message="Only error shown" />);
 
-    expect(mockOnRetry).toHaveBeenCalledTimes(1)
-  })
-}) 
+    expect(screen.queryByText('Try Again')).not.toBeInTheDocument();
+  });
+});

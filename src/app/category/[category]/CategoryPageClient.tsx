@@ -36,7 +36,7 @@ export default function CategoryPageClient({ category }: CategoryPageClientProps
   const categoryName = category.charAt(0).toUpperCase() + category.slice(1);
 
   const handleCategoryChange = (newCategory: string) => {
-    // Navigate to homepage if 'all' is selected, otherwise stay in category
+    
     if (newCategory === 'all') {
       window.location.href = '/';
     }

@@ -1,10 +1,7 @@
-/**
- * Consistent color definitions to prevent browser-specific variations
- * These colors are designed to render consistently across different browsers and devices
- */
+
 
 export const colors = {
-  // Primary colors
+  
   primary: {
     50: '#eff6ff',
     100: '#dbeafe',
@@ -12,13 +9,13 @@ export const colors = {
     300: '#93c5fd',
     400: '#60a5fa',
     500: '#3b82f6',
-    600: '#2563eb', // Main brand color
+    600: '#2563eb', 
     700: '#1d4ed8',
     800: '#1e40af',
     900: '#1e3a8a',
   },
   
-  // Gray scale
+ 
   gray: {
     50: '#f9fafb',
     100: '#f3f4f6',
@@ -32,20 +29,20 @@ export const colors = {
     900: '#111827',
   },
   
-  // Semantic colors
+  
   success: '#10b981',
   error: '#ef4444',
   warning: '#f59e0b',
   info: '#3b82f6',
   
-  // Background colors
+  
   background: {
     primary: '#ffffff',
     secondary: '#f9fafb',
     tertiary: '#f3f4f6',
   },
   
-  // Text colors
+  
   text: {
     primary: '#111827',
     secondary: '#4b5563',
@@ -53,7 +50,7 @@ export const colors = {
     disabled: '#9ca3af',
   },
   
-  // Border colors
+  
   border: {
     light: '#e5e7eb',
     medium: '#d1d5db',
@@ -61,9 +58,7 @@ export const colors = {
   }
 } as const;
 
-/**
- * CSS custom properties for consistent color usage
- */
+
 export const cssVariables = {
   '--color-primary': colors.primary[600],
   '--color-primary-hover': colors.primary[700],
@@ -75,11 +70,9 @@ export const cssVariables = {
   '--color-border': colors.border.light,
 } as const;
 
-/**
- * Get a color value with fallback for browser compatibility
- */
+
 export function getColor(colorKey: string, fallback?: string): string {
-  // Simple color mapping for common cases
+ 
   const colorMap: Record<string, string> = {
     'primary.600': colors.primary[600],
     'primary.700': colors.primary[700],
@@ -100,9 +93,7 @@ export function getColor(colorKey: string, fallback?: string): string {
   return colorMap[colorKey] || fallback || '#000000';
 }
 
-/**
- * Apply consistent colors to an element
- */
+
 export function applyConsistentColors(element: HTMLElement, colorMap: Record<string, string>) {
   Object.entries(colorMap).forEach(([property, color]) => {
     element.style.setProperty(property, color);

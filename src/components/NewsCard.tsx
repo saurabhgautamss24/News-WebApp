@@ -1,3 +1,4 @@
+
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -42,7 +43,7 @@ export default function NewsCard({
             className="object-cover"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             onError={() => setImageError(true)}
-            unoptimized={true} 
+            unoptimized
           />
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
@@ -70,7 +71,7 @@ export default function NewsCard({
           </div>
           
           <Link 
-            href={`/article/${id}`}
+            href={`/article/${encodeURIComponent(id)}`}
             className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline transition-colors"
           >
             Read More
@@ -79,4 +80,4 @@ export default function NewsCard({
       </div>
     </article>
   );
-} 
+}

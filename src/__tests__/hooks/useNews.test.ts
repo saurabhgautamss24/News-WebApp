@@ -1,16 +1,24 @@
-import { renderHook, waitFor } from '@testing-library/react'
+
+import { renderHook } from '@testing-library/react'
 import { useTopHeadlines, useCategoryHeadlines, useSearchNews } from '@/hooks/useNews'
 import useSWR from 'swr'
 
-// Mock SWR
 jest.mock('swr')
 const mockUseSWR = useSWR as jest.MockedFunction<typeof useSWR>
 
-// Mock API functions
 jest.mock('@/lib/api', () => ({
-  getTopHeadlines: jest.fn(),
-  getTopHeadlinesByCategory: jest.fn(),
-  searchNews: jest.fn(),
+  getTopHeadlines: jest.fn().mockResolvedValue({
+    articles: [],
+    totalResults: 0
+  }),
+  getTopHeadlinesByCategory: jest.fn().mockResolvedValue({
+    articles: [],
+    totalResults: 0
+  }),
+  searchNews: jest.fn().mockResolvedValue({
+    articles: [],
+    totalResults: 0
+  }),
   transformArticle: jest.fn((article) => ({
     id: article.url,
     title: article.title,
@@ -27,22 +35,24 @@ jest.mock('@/lib/api', () => ({
 describe('useNews Hooks', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+   
+    mockUseSWR.mockImplementation(() => ({
+      data: undefined,
+      error: undefined,
+      isLoading: true,
+      mutate: jest.fn(),
+      isValidating: true
+    }))
   })
 
   describe('useTopHeadlines', () => {
     it('should return loading state initially', () => {
-      mockUseSWR.mockReturnValue({
-        data: undefined,
-        error: undefined,
-        isLoading: true,
-        mutate: jest.fn()
-      })
-
       const { result } = renderHook(() => useTopHeadlines(1))
 
       expect(result.current.isLoading).toBe(true)
       expect(result.current.articles).toEqual([])
       expect(result.current.totalResults).toBe(0)
+      expect(mockUseSWR).toHaveBeenCalled()
     })
 
     it('should return articles when data is loaded', () => {
@@ -62,11 +72,12 @@ describe('useNews Hooks', () => {
         totalResults: 1
       }
 
-      mockUseSWR.mockReturnValue({
+      mockUseSWR.mockReturnValueOnce({
         data: mockData,
         error: undefined,
         isLoading: false,
-        mutate: jest.fn()
+        mutate: jest.fn(),
+        isValidating: false
       })
 
       const { result } = renderHook(() => useTopHeadlines(1))
@@ -80,32 +91,35 @@ describe('useNews Hooks', () => {
     it('should return error when API fails', () => {
       const mockError = new Error('API Error')
 
-      mockUseSWR.mockReturnValue({
+      mockUseSWR.mockReturnValueOnce({
         data: undefined,
         error: mockError,
         isLoading: false,
-        mutate: jest.fn()
+        mutate: jest.fn(),
+        isValidating: false
       })
 
       const { result } = renderHook(() => useTopHeadlines(1))
 
       expect(result.current.error).toBe(mockError)
       expect(result.current.articles).toEqual([])
+      expect(result.current.isLoading).toBe(false)
     })
   })
 
   describe('useCategoryHeadlines', () => {
     it('should not fetch when category is "all"', () => {
-      mockUseSWR.mockReturnValue({
-        data: undefined,
-        error: undefined,
-        isLoading: false,
-        mutate: jest.fn()
-      })
-
       renderHook(() => useCategoryHeadlines('all', 1))
 
-      expect(mockUseSWR).toHaveBeenCalledWith(null, expect.any(Function))
+      expect(mockUseSWR).toHaveBeenCalledWith(
+        null,
+        expect.any(Function),
+        expect.objectContaining({
+          dedupingInterval: expect.any(Number),
+          revalidateOnFocus: expect.any(Boolean),
+          revalidateOnReconnect: expect.any(Boolean)
+        })
+      )
     })
 
     it('should fetch category headlines for valid category', () => {
@@ -125,32 +139,42 @@ describe('useNews Hooks', () => {
         totalResults: 1
       }
 
-      mockUseSWR.mockReturnValue({
+      mockUseSWR.mockReturnValueOnce({
         data: mockData,
         error: undefined,
         isLoading: false,
-        mutate: jest.fn()
+        mutate: jest.fn(),
+        isValidating: false
       })
 
       const { result } = renderHook(() => useCategoryHeadlines('technology', 1))
 
       expect(result.current.articles).toHaveLength(1)
       expect(result.current.articles[0].title).toBe('Tech Article')
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    it('should return loading state initially for valid category', () => {
+      const { result } = renderHook(() => useCategoryHeadlines('technology', 1))
+
+      expect(result.current.isLoading).toBe(true)
+      expect(result.current.articles).toEqual([])
     })
   })
 
   describe('useSearchNews', () => {
     it('should not fetch when query is empty', () => {
-      mockUseSWR.mockReturnValue({
-        data: undefined,
-        error: undefined,
-        isLoading: false,
-        mutate: jest.fn()
-      })
-
       renderHook(() => useSearchNews('', 1))
 
-      expect(mockUseSWR).toHaveBeenCalledWith(null, expect.any(Function))
+      expect(mockUseSWR).toHaveBeenCalledWith(
+        null,
+        expect.any(Function),
+        expect.objectContaining({
+          dedupingInterval: expect.any(Number),
+          revalidateOnFocus: expect.any(Boolean),
+          revalidateOnReconnect: expect.any(Boolean)
+        })
+      )
     })
 
     it('should fetch search results for valid query', () => {
@@ -170,33 +194,44 @@ describe('useNews Hooks', () => {
         totalResults: 1
       }
 
-      mockUseSWR.mockReturnValue({
+      mockUseSWR.mockReturnValueOnce({
         data: mockData,
         error: undefined,
         isLoading: false,
-        mutate: jest.fn()
+        mutate: jest.fn(),
+        isValidating: false
       })
 
       const { result } = renderHook(() => useSearchNews('test query', 1))
 
       expect(result.current.articles).toHaveLength(1)
       expect(result.current.articles[0].title).toBe('Search Result')
+      expect(result.current.isLoading).toBe(false)
+    })
+
+    it('should return loading state initially for valid query', () => {
+      const { result } = renderHook(() => useSearchNews('test', 1))
+
+      expect(result.current.isLoading).toBe(true)
+      expect(result.current.articles).toEqual([])
     })
 
     it('should handle search errors', () => {
       const mockError = new Error('Search failed')
 
-      mockUseSWR.mockReturnValue({
+      mockUseSWR.mockReturnValueOnce({
         data: undefined,
         error: mockError,
         isLoading: false,
-        mutate: jest.fn()
+        mutate: jest.fn(),
+        isValidating: false
       })
 
       const { result } = renderHook(() => useSearchNews('test', 1))
 
       expect(result.current.error).toBe(mockError)
       expect(result.current.articles).toEqual([])
+      expect(result.current.isLoading).toBe(false)
     })
   })
-}) 
+})

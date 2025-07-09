@@ -1,8 +1,9 @@
-import React from 'react'
+
+import React, { ReactNode } from 'react'
 import { render, RenderOptions } from '@testing-library/react'
 import { SWRConfig } from 'swr'
 
-// Mock data for tests
+
 export const mockArticles = [
   {
     id: 'https://example.com/article1',
@@ -13,7 +14,7 @@ export const mockArticles = [
     publishedAt: '2024-01-15T10:30:00Z',
     url: 'https://example.com/article1',
     author: 'Test Author',
-    content: 'Test content for article 1'
+    content: 'Test content for article 1',
   },
   {
     id: 'https://example.com/article2',
@@ -24,36 +25,38 @@ export const mockArticles = [
     publishedAt: '2024-01-15T09:15:00Z',
     url: 'https://example.com/article2',
     author: 'Another Author',
-    content: 'Test content for article 2'
-  }
+    content: 'Test content for article 2',
+  },
 ]
 
 export const mockNewsResponse = {
   status: 'ok',
   totalResults: 2,
-  articles: mockArticles
+  articles: mockArticles,
 }
 
-// Custom render function with SWR provider
-const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+const AllTheProviders = ({ children }: { children: ReactNode }) => {
   return (
-    <SWRConfig value={{ 
-      provider: () => new Map(),
-      dedupingInterval: 0,
-      focusThrottleInterval: 0,
-      errorRetryInterval: 0,
-      errorRetryCount: 0,
-    }}>
+    <SWRConfig
+      value={{
+        provider: () => new Map(),
+        dedupingInterval: 0,
+        focusThrottleInterval: 0,
+        errorRetryInterval: 0,
+        errorRetryCount: 0,
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+      }}
+    >
       {children}
     </SWRConfig>
   )
 }
-
 const customRender = (
   ui: React.ReactElement,
   options?: Omit<RenderOptions, 'wrapper'>
 ) => render(ui, { wrapper: AllTheProviders, ...options })
 
-// Re-export everything
+// Re-export everything from RTL
 export * from '@testing-library/react'
-export { customRender as render } 
+export { customRender as render }

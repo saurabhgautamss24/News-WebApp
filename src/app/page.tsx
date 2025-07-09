@@ -13,11 +13,9 @@ export default function HomePage() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   
-  // Use different hooks based on selected category
   const topHeadlines = useTopHeadlines(currentPage);
   const categoryHeadlines = useCategoryHeadlines(activeCategory, currentPage);
   
-  // Select the appropriate data based on category
   const { articles, totalResults, isLoading, error, mutate } = 
     activeCategory === 'all' ? topHeadlines : categoryHeadlines;
   

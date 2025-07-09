@@ -1,4 +1,4 @@
-// Types for NewsAPI responses
+
 export interface NewsArticle {
   source: {
     id: string | null;
@@ -25,7 +25,7 @@ export interface NewsError {
   message: string;
 }
 
-// API configuration
+
 const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 const BASE_URL = process.env.NEXT_PUBLIC_NEWS_API_BASE_URL || 'https://newsapi.org/v2';
 
@@ -33,7 +33,6 @@ if (!API_KEY) {
   throw new Error('NEXT_PUBLIC_NEWS_API_KEY is not defined');
 }
 
-// Helper function to build API URL
 function buildApiUrl(endpoint: string, params: Record<string, string> = {}) {
   const url = new URL(`${BASE_URL}${endpoint}`);
   url.searchParams.set('apiKey', API_KEY!);
@@ -109,10 +108,10 @@ export async function searchNews(
   return response.json();
 }
 
-// Helper function to transform API response to our app's format
+
 export function transformArticle(article: NewsArticle) {
   return {
-    id: article.url, // Using URL as ID since NewsAPI doesn't provide unique IDs
+    id: article.url, 
     title: article.title,
     description: article.description || '',
     imageUrl: article.urlToImage || undefined,

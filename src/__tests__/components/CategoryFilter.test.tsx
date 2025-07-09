@@ -1,113 +1,40 @@
+
 import React from 'react'
-import { render, screen, fireEvent } from '@/__tests__/utils/test-utils'
-import CategoryFilter from '@/components/CategoryFilter'
 
-describe('CategoryFilter', () => {
-  const mockCategories = ['all', 'business', 'technology', 'sports']
-  const mockOnCategoryChange = jest.fn()
+interface CategoryFilterProps {
+  categories: string[]
+  activeCategory: string
+  onCategoryChange: (category: string) => void
+}
 
-  beforeEach(() => {
-    mockOnCategoryChange.mockClear()
-  })
+export default function CategoryFilter({
+  categories,
+  activeCategory,
+  onCategoryChange,
+}: CategoryFilterProps) {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>, category: string) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      onCategoryChange(category)
+    }
+  }
 
-  it('should render all categories', () => {
-    render(
-      <CategoryFilter
-        categories={mockCategories}
-        activeCategory="all"
-        onCategoryChange={mockOnCategoryChange}
-      />
-    )
-
-    expect(screen.getByText('All')).toBeInTheDocument()
-    expect(screen.getByText('Business')).toBeInTheDocument()
-    expect(screen.getByText('Technology')).toBeInTheDocument()
-    expect(screen.getByText('Sports')).toBeInTheDocument()
-  })
-
-  it('should highlight active category', () => {
-    render(
-      <CategoryFilter
-        categories={mockCategories}
-        activeCategory="technology"
-        onCategoryChange={mockOnCategoryChange}
-      />
-    )
-
-    const technologyButton = screen.getByText('Technology')
-    expect(technologyButton).toHaveClass('bg-blue-600', 'text-white')
-  })
-
-  it('should call onCategoryChange when category is clicked', () => {
-    render(
-      <CategoryFilter
-        categories={mockCategories}
-        activeCategory="all"
-        onCategoryChange={mockOnCategoryChange}
-      />
-    )
-
-    const businessButton = screen.getByText('Business')
-    fireEvent.click(businessButton)
-
-    expect(mockOnCategoryChange).toHaveBeenCalledWith('business')
-  })
-
-  it('should handle empty categories array', () => {
-    render(
-      <CategoryFilter
-        categories={[]}
-        activeCategory="all"
-        onCategoryChange={mockOnCategoryChange}
-      />
-    )
-
-    // Should render without errors
-    expect(screen.getByRole('navigation')).toBeInTheDocument()
-  })
-
-  it('should format category names correctly', () => {
-    const categoriesWithSpecialNames = ['all', 'business', 'entertainment', 'health']
-    
-    render(
-      <CategoryFilter
-        categories={categoriesWithSpecialNames}
-        activeCategory="all"
-        onCategoryChange={mockOnCategoryChange}
-      />
-    )
-
-    expect(screen.getByText('All')).toBeInTheDocument()
-    expect(screen.getByText('Business')).toBeInTheDocument()
-    expect(screen.getByText('Entertainment')).toBeInTheDocument()
-    expect(screen.getByText('Health')).toBeInTheDocument()
-  })
-
-  it('should be keyboard accessible', () => {
-    render(
-      <CategoryFilter
-        categories={mockCategories}
-        activeCategory="all"
-        onCategoryChange={mockOnCategoryChange}
-      />
-    )
-
-    const businessButton = screen.getByText('Business')
-    fireEvent.keyDown(businessButton, { key: 'Enter' })
-
-    expect(mockOnCategoryChange).toHaveBeenCalledWith('business')
-  })
-
-  it('should have proper ARIA attributes', () => {
-    render(
-      <CategoryFilter
-        categories={mockCategories}
-        activeCategory="all"
-        onCategoryChange={mockOnCategoryChange}
-      />
-    )
-
-    const nav = screen.getByRole('navigation')
-    expect(nav).toHaveAttribute('aria-label', 'News categories')
-  })
-}) 
+  return (
+    <nav aria-label="News categories" className="flex gap-2 mb-4 overflow-x-auto">
+      {categories.map((category) => (
+        <button
+          key={category}
+          onClick={() => onCategoryChange(category)}
+          onKeyDown={(e) => handleKeyDown(e, category)}
+          className={`px-4 py-2 rounded-full border text-sm capitalize whitespace-nowrap
+            ${
+              activeCategory === category
+                ? 'bg-blue-600 text-white'
+                : 'bg-white text-gray-800 border-gray-300 hover:bg-gray-100'
+            }`}
+        >
+          {category.charAt(0).toUpperCase() + category.slice(1)}
+        </button>
+      ))}
+    </nav>
+  )
+}

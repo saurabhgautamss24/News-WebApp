@@ -1,11 +1,18 @@
-export default function LoadingSpinner() {
+
+import React from 'react';
+
+const LoadingSpinner = () => {
   return (
-    <div className="flex justify-center items-center py-12">
-      <div className="relative">
-        <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-        <div className="absolute inset-0 w-12 h-12 border-4 border-transparent border-t-blue-400 rounded-full animate-ping"></div>
-      </div>
-      <span className="ml-3 text-gray-600 font-medium">Loading news...</span>
+    <div 
+      role="status"
+      aria-label="Loading news articles"
+      className="flex flex-col items-center justify-center"
+      data-testid="spinner"
+    >
+      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mb-2"></div>
+      <span className="text-gray-600">Loading...</span>
     </div>
   );
-} 
+};
+
+export default LoadingSpinner;

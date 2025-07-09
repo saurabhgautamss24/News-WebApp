@@ -1,32 +1,26 @@
-'use client';
+'use client'
 
-export const dynamic = 'force-dynamic'; 
-export const dynamicParams = true;
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import { useSearchNews } from '@/hooks/useNews'
+import NewsCard from '@/components/NewsCard'
+import Pagination from '@/components/Pagination'
+import LoadingSpinner from '@/components/LoadingSpinner'
+import ErrorMessage from '@/components/ErrorMessage'
 
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useSearchNews } from '@/hooks/useNews';
-import NewsCard from '@/components/NewsCard';
-import Pagination from '@/components/Pagination';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import ErrorMessage from '@/components/ErrorMessage';
+// ⛔️ Next.js needs dynamic rendering for search
+export const dynamic = 'force-dynamic'
 
-export default function SearchPage() {
-  const searchParams = useSearchParams();
-  const query = searchParams.get('q') || '';
-  const [currentPage, setCurrentPage] = useState(1);
-  
-  const { articles, totalResults, isLoading, error, mutate } = useSearchNews(query, currentPage);
-  const totalPages = Math.ceil(totalResults / 20);
+function SearchContent() {
+  const searchParams = useSearchParams()
+  const query = searchParams.get('q') || ''
+  const [currentPage, setCurrentPage] = useState(1)
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-    console.log('Page changed:', page);
-  };
+  const { articles, totalResults, isLoading, error, mutate } = useSearchNews(query, currentPage)
+  const totalPages = Math.ceil(totalResults / 20)
 
-  const handleRetry = () => {
-    mutate();
-  };
+  const handlePageChange = (page: number) => setCurrentPage(page)
+  const handleRetry = () => mutate()
 
   return (
     <div className="space-y-8">
@@ -36,16 +30,13 @@ export default function SearchPage() {
           {query ? `Showing results for "${query}"` : 'Search for news articles'}
         </p>
       </section>
-      
+
       {query ? (
         <>
           {isLoading ? (
             <LoadingSpinner />
           ) : error ? (
-            <ErrorMessage 
-              message={error.message || 'Failed to search news articles'} 
-              onRetry={handleRetry}
-            />
+            <ErrorMessage message={error.message || 'Failed to search news articles'} onRetry={handleRetry} />
           ) : articles.length > 0 ? (
             <>
               <section>
@@ -63,13 +54,8 @@ export default function SearchPage() {
                   ))}
                 </div>
               </section>
-              
               {totalPages > 1 && (
-                <Pagination 
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={handlePageChange}
-                />
+                <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
               )}
             </>
           ) : (
@@ -96,5 +82,13 @@ export default function SearchPage() {
         </section>
       )}
     </div>
-  );
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <SearchContent />
+    </Suspense>
+  )
 }

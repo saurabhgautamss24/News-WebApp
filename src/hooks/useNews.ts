@@ -20,8 +20,6 @@ export function useTopHeadlines(page: number = 1) {
     mutate
   };
 }
-
-
 export function useCategoryHeadlines(category: string, page: number = 1) {
   const { data, error, isLoading, mutate } = useSWR(
     category && category !== 'all' ? ['category-headlines', category, page] : null,

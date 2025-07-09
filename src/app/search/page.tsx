@@ -8,7 +8,7 @@ import Pagination from '@/components/Pagination'
 import LoadingSpinner from '@/components/LoadingSpinner'
 import ErrorMessage from '@/components/ErrorMessage'
 
-// ⛔️ Next.js needs dynamic rendering for search
+
 export const dynamic = 'force-dynamic'
 
 function SearchContent() {

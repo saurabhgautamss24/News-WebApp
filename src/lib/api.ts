@@ -1,122 +1,47 @@
 
-export interface NewsArticle {
-  source: {
-    id: string | null;
-    name: string;
-  };
-  author: string | null;
-  title: string;
-  description: string | null;
-  url: string;
-  urlToImage: string | null;
-  publishedAt: string;
-  content: string | null;
-}
 
-export interface NewsResponse {
-  status: string;
-  totalResults: number;
-  articles: NewsArticle[];
-}
+const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
+const BASE_URL =
+  process.env.NEXT_PUBLIC_NEWS_API_BASE_URL || "https://newsapi.org/v2";
 
-export interface NewsError {
-  status: string;
-  code: string;
-  message: string;
+if (!API_KEY) {
+  throw new Error('API key is not defined');
 }
 
 
-const API_KEY = '70692c1291964e23b0eb43c83209d8c3';
-const BASE_URL = 'https://newsapi.org/v2';
+export async function fetchTopHeadlines(country = 'us', page = 1) {
+  const url = `${BASE_URL}/top-headlines?country=${country}&page=${page}&pageSize=20&apiKey=${API_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
 
-
-function buildApiUrl(endpoint: string, params: Record<string, string> = {}) {
-  const url = new URL(`${BASE_URL}${endpoint}`);
-  url.searchParams.set('apiKey', API_KEY);
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value) {
-      url.searchParams.set(key, value);
-    }
-  });
-
-  return url.toString();
-}
-
-export async function getTopHeadlines(
-  country: string = 'us',
-  page: number = 1
-): Promise<NewsResponse> {
-  // const url = buildApiUrl('/top-headlines', {
-  //   country,
-  //   page: page.toString(),
-  //   pageSize: '20',
-  // });
-
-  const response = await fetch("https://backend-swart-five-47.vercel.app/api/khabar/getTopHeadlines");
-
-  if (!response.ok) {
-    const error: NewsError = await response.json();
-    throw new Error(error.message || 'Failed to fetch top headlines');
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to fetch top headlines');
   }
 
-  return response.json();
+  return data;
 }
 
-export async function getTopHeadlinesByCategory(
-  category: string,
-  country: string = 'us',
-  page: number = 1
-): Promise<NewsResponse> {
-  const url = buildApiUrl('/top-headlines', {
-    category,
-    country,
-    page: page.toString(),
-    pageSize: '20',
-  });
+export async function fetchCategoryHeadlines(category: string, page = 1) {
+  const url = `${BASE_URL}/top-headlines?country=us&category=${category}&page=${page}&pageSize=20&apiKey=${API_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
 
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    const error: NewsError = await response.json();
-    throw new Error(error.message || 'Failed to fetch category headlines');
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to fetch category headlines');
   }
 
-  return response.json();
+  return data;
 }
 
-export async function searchNews(
-  query: string,
-  page: number = 1,
-  sortBy: 'relevancy' | 'popularity' | 'publishedAt' = 'publishedAt'
-): Promise<NewsResponse> {
-  const url = buildApiUrl('/everything', {
-    q: query,
-    page: page.toString(),
-    pageSize: '20',
-    sortBy,
-  });
+export async function fetchSearchNews(query: string, page = 1, sortBy = 'publishedAt') {
+  const url = `${BASE_URL}/everything?q=${query}&page=${page}&pageSize=20&sortBy=${sortBy}&apiKey=${API_KEY}`;
+  const res = await fetch(url);
+  const data = await res.json();
 
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    const error: NewsError = await response.json();
-    throw new Error(error.message || 'Failed to search news');
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to search news');
   }
 
-  return response.json();
+  return data;
 }
 
-export function transformArticle(article: NewsArticle) {
-  return {
-    id: article.url,
-    title: article.title,
-    description: article.description || '',
-    imageUrl: article.urlToImage || undefined,
-    source: article.source.name,
-    publishedAt: article.publishedAt,
-    url: article.url,
-    author: article.author,
-    content: article.content,
-  };
-}

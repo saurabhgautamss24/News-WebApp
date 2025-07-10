@@ -8,9 +8,6 @@ interface ArticlePageProps {
 
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { id } = await params;
-
-
-  
   return (
     <div className="max-w-4xl mx-auto">
       <div className="mb-6">
@@ -21,7 +18,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           ← Back to News
         </Link>
       </div>
-      
       <article className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="h-64 bg-gray-200 relative">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">

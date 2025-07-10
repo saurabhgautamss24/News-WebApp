@@ -1,9 +1,5 @@
-
-import React, { ReactNode } from 'react'
-import { render, RenderOptions } from '@testing-library/react'
-import { SWRConfig } from 'swr'
-
-
+import React, { ReactNode } from 'react';
+import { render, RenderOptions } from '@testing-library/react';
 export const mockArticles = [
   {
     id: 'https://example.com/article1',
@@ -27,36 +23,22 @@ export const mockArticles = [
     author: 'Another Author',
     content: 'Test content for article 2',
   },
-]
+];
 
 export const mockNewsResponse = {
   status: 'ok',
   totalResults: 2,
   articles: mockArticles,
-}
+};
 
 const AllTheProviders = ({ children }: { children: ReactNode }) => {
-  return (
-    <SWRConfig
-      value={{
-        provider: () => new Map(),
-        dedupingInterval: 0,
-        focusThrottleInterval: 0,
-        errorRetryInterval: 0,
-        errorRetryCount: 0,
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
-      }}
-    >
-      {children}
-    </SWRConfig>
-  )
-}
+  return <>{children}</>;
+};
+
 const customRender = (
   ui: React.ReactElement,
   options?: Omit<RenderOptions, 'wrapper'>
-) => render(ui, { wrapper: AllTheProviders, ...options })
+) => render(ui, { wrapper: AllTheProviders, ...options });
 
-// Re-export everything from RTL
-export * from '@testing-library/react'
-export { customRender as render }
+export * from '@testing-library/react';
+export { customRender as render };

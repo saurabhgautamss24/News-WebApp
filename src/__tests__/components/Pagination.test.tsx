@@ -1,162 +1,101 @@
-
 import React from 'react'
 import { render, screen, fireEvent } from '@testing-library/react'
 import Pagination from '@/components/Pagination'
 
-describe('Pagination', () => {
+describe('Pagination Component', () => {
   const mockOnPageChange = jest.fn()
 
   beforeEach(() => {
-    mockOnPageChange.mockClear()
+    jest.clearAllMocks()
   })
 
-  it('should render pagination controls', () => {
-    render(
-      <Pagination
-        currentPage={1}
-        totalPages={5}
-        onPageChange={mockOnPageChange}
-      />
-    )
+  it('renders basic pagination when totalPages ≤ 5', () => {
+    render(<Pagination currentPage={1} totalPages={5} onPageChange={mockOnPageChange} />)
 
-    expect(screen.getByText('Previous')).toBeInTheDocument()
-    expect(screen.getByText('Next')).toBeInTheDocument()
+    expect(screen.getByText('Previous')).toBeDisabled()
+    expect(screen.getByText('Next')).not.toBeDisabled()
+
+    for (let i = 1; i <= 5; i++) {
+      expect(screen.getByText(i.toString())).toBeInTheDocument()
+    }
+  })
+
+  it('disables Next on last page', () => {
+    render(<Pagination currentPage={5} totalPages={5} onPageChange={mockOnPageChange} />)
+
+    expect(screen.getByText('Next')).toBeDisabled()
+  })
+
+  it('renders ellipsis when currentPage is in middle of many pages', () => {
+    render(<Pagination currentPage={10} totalPages={20} onPageChange={mockOnPageChange} />)
+
+    expect(screen.getAllByText('...').length).toBe(2)
     expect(screen.getByText('1')).toBeInTheDocument()
-    expect(screen.getByText('2')).toBeInTheDocument()
-    expect(screen.getByText('3')).toBeInTheDocument()
-    expect(screen.getByText('4')).toBeInTheDocument()
-    expect(screen.getByText('5')).toBeInTheDocument()
+    expect(screen.getByText('10')).toBeInTheDocument()
+    expect(screen.getByText('20')).toBeInTheDocument()
   })
 
-  it('should highlight current page', () => {
-    render(
-      <Pagination
-        currentPage={3}
-        totalPages={5}
-        onPageChange={mockOnPageChange}
-      />
-    )
+  it('renders ellipsis when currentPage is near start', () => {
+    render(<Pagination currentPage={2} totalPages={10} onPageChange={mockOnPageChange} />)
 
-    const currentPageButton = screen.getByText('3')
-    expect(currentPageButton).toHaveClass('bg-blue-600', 'text-white')
-  })
-
-  it('should call onPageChange when page is clicked', () => {
-    render(
-      <Pagination
-        currentPage={1}
-        totalPages={5}
-        onPageChange={mockOnPageChange}
-      />
-    )
-
-    const page2Button = screen.getByText('2')
-    fireEvent.click(page2Button)
-
-    expect(mockOnPageChange).toHaveBeenCalledWith(2)
-  })
-
-  it('should disable Previous button on first page', () => {
-    render(
-      <Pagination
-        currentPage={1}
-        totalPages={5}
-        onPageChange={mockOnPageChange}
-      />
-    )
-
-    const previousButton = screen.getByText('Previous')
-    expect(previousButton).toBeDisabled()
-  })
-
-  it('should disable Next button on last page', () => {
-    render(
-      <Pagination
-        currentPage={5}
-        totalPages={5}
-        onPageChange={mockOnPageChange}
-      />
-    )
-
-    const nextButton = screen.getByText('Next')
-    expect(nextButton).toBeDisabled()
-  })
-
-  it('should handle Previous button click', () => {
-    render(
-      <Pagination
-        currentPage={3}
-        totalPages={5}
-        onPageChange={mockOnPageChange}
-      />
-    )
-
-    const previousButton = screen.getByText('Previous')
-    fireEvent.click(previousButton)
-
-    expect(mockOnPageChange).toHaveBeenCalledWith(2)
-  })
-
-  it('should handle Next button click', () => {
-    render(
-      <Pagination
-        currentPage={3}
-        totalPages={5}
-        onPageChange={mockOnPageChange}
-      />
-    )
-
-    const nextButton = screen.getByText('Next')
-    fireEvent.click(nextButton)
-
-    expect(mockOnPageChange).toHaveBeenCalledWith(4)
-  })
-
-  it('should handle large number of pages', () => {
-    render(
-      <Pagination
-        currentPage={10}
-        totalPages={20}
-        onPageChange={mockOnPageChange}
-      />
-    )
-
-    expect(screen.getAllByText('...').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('...').length).toBe(1)
     expect(screen.getByText('10')).toBeInTheDocument()
   })
 
-  it('should handle single page', () => {
-    render(
-      <Pagination
-        currentPage={1}
-        totalPages={1}
-        onPageChange={mockOnPageChange}
-      />
-    )
+  it('renders ellipsis when currentPage is near end', () => {
+    render(<Pagination currentPage={9} totalPages={10} onPageChange={mockOnPageChange} />)
 
+    expect(screen.getAllByText('...').length).toBe(1)
     expect(screen.getByText('1')).toBeInTheDocument()
-
-    const previous = screen.getByText('Previous')
-    const next = screen.getByText('Next')
-
-    expect(previous).toBeDisabled()
-    expect(next).toBeDisabled()
   })
 
-  it('should be keyboard accessible', () => {
-    render(
-      <Pagination
-        currentPage={2}
-        totalPages={5}
-        onPageChange={mockOnPageChange}
-      />
-    )
+  it('calls onPageChange when clicking a page number', () => {
+    render(<Pagination currentPage={2} totalPages={5} onPageChange={mockOnPageChange} />)
 
-    const page3Button = screen.getByText('3')
-    fireEvent.keyDown(page3Button, { key: 'Enter', code: 'Enter', charCode: 13 })
-    fireEvent.click(page3Button)
+    fireEvent.click(screen.getByText('3'))
+    expect(mockOnPageChange).toHaveBeenCalledWith(3)
+  })
+
+  it('calls onPageChange when clicking Previous and Next', () => {
+    render(<Pagination currentPage={3} totalPages={5} onPageChange={mockOnPageChange} />)
+
+    fireEvent.click(screen.getByText('Previous'))
+    expect(mockOnPageChange).toHaveBeenCalledWith(2)
+
+    fireEvent.click(screen.getByText('Next'))
+    expect(mockOnPageChange).toHaveBeenCalledWith(4)
+  })
+
+  it('disables Previous and Next on single page', () => {
+    render(<Pagination currentPage={1} totalPages={1} onPageChange={mockOnPageChange} />)
+
+    expect(screen.getByText('Previous')).toBeDisabled()
+    expect(screen.getByText('Next')).toBeDisabled()
+  })
+
+  it('highlights the current page', () => {
+    render(<Pagination currentPage={3} totalPages={5} onPageChange={mockOnPageChange} />)
+
+    const currentPageBtn = screen.getByText('3')
+    expect(currentPageBtn).toHaveClass('bg-blue-600', 'text-white')
+  })
+
+  it('does not call onPageChange when clicking ellipsis', () => {
+    render(<Pagination currentPage={10} totalPages={20} onPageChange={mockOnPageChange} />)
+
+    const ellipsis = screen.getAllByText('...')[0]
+    fireEvent.click(ellipsis)
+
+    expect(mockOnPageChange).not.toHaveBeenCalled()
+  })
+
+  it('handles keyboard Enter on page number', () => {
+    render(<Pagination currentPage={2} totalPages={5} onPageChange={mockOnPageChange} />)
+
+    const page3 = screen.getByText('3')
+    fireEvent.keyDown(page3, { key: 'Enter', code: 'Enter', charCode: 13 })
+    fireEvent.click(page3)
 
     expect(mockOnPageChange).toHaveBeenCalledWith(3)
   })
 })
-

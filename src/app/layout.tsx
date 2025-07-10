@@ -61,7 +61,6 @@ export default function RootLayout({
               ))}
             </div>
 
-            {/* Search */}
             <form onSubmit={handleSearch} className="mt-4 md:mt-0 w-full md:w-auto flex justify-center">
               <div className="relative w-full max-w-xs">
                 <input

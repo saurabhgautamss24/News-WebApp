@@ -1,5 +1,3 @@
-
-
 const API_KEY = process.env.NEXT_PUBLIC_NEWS_API_KEY;
 const BASE_URL =
   process.env.NEXT_PUBLIC_NEWS_API_BASE_URL || "https://newsapi.org/v2";
@@ -7,8 +5,6 @@ const BASE_URL =
 if (!API_KEY) {
   throw new Error('API key is not defined');
 }
-
-
 export async function fetchTopHeadlines(country = 'us', page = 1) {
   const url = `${BASE_URL}/top-headlines?country=${country}&page=${page}&pageSize=20&apiKey=${API_KEY}`;
   const res = await fetch(url);

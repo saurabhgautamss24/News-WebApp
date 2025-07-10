@@ -1,4 +1,3 @@
-
 import {
   fetchTopHeadlines,
   fetchCategoryHeadlines,
@@ -7,7 +6,6 @@ import {
 
 global.fetch = jest.fn()
 
-// Set mock API key environment variable
 process.env.NEXT_PUBLIC_NEWS_API_KEY = 'test-api-key'
 
 describe('API Fetch Functions', () => {
